@@ -22,7 +22,8 @@ all-hdd: $(IMAGE_NAME).hdd
 .PHONY: run
 run: $(IMAGE_NAME).iso
 	qemu-system-x86_64 \
-		-M q35,smm=off \
+		-M q35,smm=off,accel=kvm \
+		-cpu host,+x2apic \
 		-cdrom $(IMAGE_NAME).iso \
 		-boot d \
 		$(QEMUFLAGS)
@@ -30,7 +31,8 @@ run: $(IMAGE_NAME).iso
 .PHONY: run-uefi
 run-uefi: edk2-ovmf $(IMAGE_NAME).iso
 	qemu-system-x86_64 \
-		-M q35,smm=off \
+		-M q35,smm=off,accel=kvm \
+		-cpu host,+x2apic \
 		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf/ovmf-code-x86_64.fd,readonly=on \
 		-cdrom $(IMAGE_NAME).iso \
 		-boot d \
@@ -39,14 +41,16 @@ run-uefi: edk2-ovmf $(IMAGE_NAME).iso
 .PHONY: run-hdd
 run-hdd: $(IMAGE_NAME).hdd
 	qemu-system-x86_64 \
-		-M q35,smm=off \
+		-M q35,smm=off,accel=kvm \
+		-cpu host,+x2apic \
 		-hda $(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
 
 .PHONY: run-hdd-uefi
 run-hdd-uefi: edk2-ovmf $(IMAGE_NAME).hdd
 	qemu-system-x86_64 \
-		-M q35,smm=off \
+		-M q35,smm=off,accel=kvm \
+		-cpu host,+x2apic \
 		-drive if=pflash,unit=0,format=raw,file=edk2-ovmf/ovmf-code-x86_64.fd,readonly=on \
 		-hda $(IMAGE_NAME).hdd \
 		$(QEMUFLAGS)
