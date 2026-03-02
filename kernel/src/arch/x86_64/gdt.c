@@ -8,11 +8,11 @@ __attribute__ ((aligned (16))) uint8_t df_stack[4096];
 
 __attribute__ ((aligned (16))) uint8_t nmi_stack[4096];
 
-static union GDTEntry gdt[8];
-static struct GDTR gdtr;
+static union gdtEntry gdt[8];
+static struct gdtR gdtr;
 struct TSS tss;
 
-void GDT_fill_entry (int num, uint8_t access, uint8_t flags) {
+void gdt_fill_entry (int num, uint8_t access, uint8_t flags) {
     gdt[num].gdt_entry.limit_low = 0;
     gdt[num].gdt_entry.base_low = 0;
     gdt[num].gdt_entry.base_mid = 0;
@@ -22,7 +22,7 @@ void GDT_fill_entry (int num, uint8_t access, uint8_t flags) {
     gdt[num].gdt_entry.base_high = 0;
 }
 
-void GDT_set_tss(int num) {
+void gdt_set_tss(int num) {
     uint64_t tss_base = (uint64_t)&tss;
     gdt[num].gdt_entry.limit_low = sizeof(tss) - 1;
     gdt[num].gdt_entry.base_low = tss_base & 0xffff;
@@ -35,14 +35,14 @@ void GDT_set_tss(int num) {
 }
 
 
-void GDT_init() {
-    GDT_fill_entry (0, 0, 0);      // Null                | 0x00
-    GDT_fill_entry (1, 0x9A, 0xA); // 64 Bit Kernel Code  | 0x08
-    GDT_fill_entry (2, 0x92, 0xC); // 64 Bit Kernel Data  | 0x10
-    GDT_fill_entry (3, 0xFA, 0xC); // 32 Bit User Code    | 0x18
-    GDT_fill_entry (4, 0xF2, 0xC); // 64 Bit User Data    | 0x20
-    GDT_fill_entry (5, 0xFA, 0xA); // 64 Bit User Code    | 0x28
-    GDT_set_tss (6);               // TSS Entry 1/2       | 0x30
+void gdt_init() {
+    gdt_fill_entry (0, 0, 0);      // Null                | 0x00
+    gdt_fill_entry (1, 0x9A, 0xA); // 64 Bit Kernel Code  | 0x08
+    gdt_fill_entry (2, 0x92, 0xC); // 64 Bit Kernel Data  | 0x10
+    gdt_fill_entry (3, 0xFA, 0xC); // 32 Bit User Code    | 0x18
+    gdt_fill_entry (4, 0xF2, 0xC); // 64 Bit User Data    | 0x20
+    gdt_fill_entry (5, 0xFA, 0xA); // 64 Bit User Code    | 0x28
+    gdt_set_tss (6);               // TSS Entry 1/2       | 0x30
                                    // TSS Entry 2/2       | 0x38
 
     tss.ist[1] = (uint64_t)(df_stack + sizeof (df_stack));

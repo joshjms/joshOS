@@ -14,7 +14,7 @@
 
 static uint32_t pit_hz = 0;
 
-void PIT_sleep_ms(unsigned int ms) {
+void pit_sleep_ms(unsigned int ms) {
     uint64_t startTicks = pitInteruptsTriggered;
     uint64_t targetTicks = startTicks + ((uint64_t)ms * pit_hz) / 1000;
 
@@ -30,7 +30,7 @@ void PIT_sleep_ms(unsigned int ms) {
     }
 }
 
-void PIT_init(uint32_t frequency) {
+void pit_init(uint32_t frequency) {
     pit_hz = frequency;
 
     uint32_t div = PIT_FREQUENCY / frequency;

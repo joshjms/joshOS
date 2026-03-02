@@ -4,5 +4,5 @@
 #include <interrupts/timer.h>
 
 void register_interrupt_handlers() {
-    IRQ_register_handler(0, apic_timer_isr);
+    irq_register_handler(0, apic_timer_isr);
 }

@@ -2,11 +2,11 @@
 
 #include <stdint.h>
 
-struct TSSGDTAddr {
+struct TSSgdtAddr {
     uint64_t tss_addr;
 };
 
-struct __attribute__((packed)) GDTGDTEntry {
+struct __attribute__((packed)) gdtgdtEntry {
     uint16_t limit_low;
     uint16_t base_low;
     uint8_t  base_mid;
@@ -16,12 +16,12 @@ struct __attribute__((packed)) GDTGDTEntry {
     uint8_t  base_high;
 };
 
-union __attribute__((packed)) GDTEntry {
-    struct GDTGDTEntry gdt_entry;
-    struct TSSGDTAddr tss_addr;
+union __attribute__((packed)) gdtEntry {
+    struct gdtgdtEntry gdt_entry;
+    struct TSSgdtAddr tss_addr;
 };
 
-struct __attribute__((packed)) GDTR {
+struct __attribute__((packed)) gdtR {
     uint16_t limit;
     uint64_t base;
 };
@@ -36,9 +36,9 @@ struct __attribute__ ((packed)) TSS {
     uint16_t reserved3, io_map_base;
 };
 
-extern void lgdt(struct GDTR* gdtr);
+extern void lgdt(struct gdtR* gdtr);
 extern void ltr(uint16_t ltr);
 extern void reloadSegments();
 
-extern void GDT_init();
+extern void gdt_init();
 extern struct TSS tss;

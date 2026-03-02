@@ -4,6 +4,6 @@
 
 extern volatile uint64_t pitInteruptsTriggered;
 
-void PIT_sleep_ms(unsigned int ms);
+void pit_sleep_ms(unsigned int ms);
 
-void PIT_init(uint32_t hz);
+void pit_init(uint32_t hz);

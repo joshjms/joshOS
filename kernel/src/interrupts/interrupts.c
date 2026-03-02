@@ -36,13 +36,12 @@ void exception_handler(struct registers *regs) {
 
 static void (*irq_handlers[256])(struct registers *);
 
-void IRQ_register_handler(int irq, void (*handler)(struct registers *)) {
+void irq_register_handler(int irq, void (*handler)(struct registers *)) {
     irq_handlers[irq] = handler;
-    IRQ_unmask(irq);
+    irq_unmask(irq);
 }
 
 void interrupt_handler(struct registers *regs) {
-    // Spurious APIC interrupt - no EOI required
     if (regs->vector == 0xFF) return;
 
     int irq = regs->vector - 32;
@@ -51,5 +50,5 @@ void interrupt_handler(struct registers *regs) {
     else {
         printk("Unhandled interrupt: vector %d\n", regs->vector);
     }
-    LAPIC_eoi();
+    lapic_eoi();
 }

@@ -5,5 +5,5 @@
 void apic_timer_isr(struct registers *regs) {
     (void)regs;
     
-    LAPIC_eoi();
+    lapic_eoi();
 }

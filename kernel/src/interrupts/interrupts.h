@@ -9,7 +9,7 @@ struct registers {
     uint64_t rip, cs, rflags, rsp, ss;
 };
 
-void IRQ_register_handler(int irq, void (*handler)(struct registers *));
+void irq_register_handler(int irq, void (*handler)(struct registers *));
 
 void interrupt_handler(struct registers *regs);
 

@@ -30,14 +30,14 @@
 #define MASTER_OFFSET 0x20
 #define SLAVE_OFFSET 0x28
 
-void PIC_eoi(uint8_t irq) {
+void pic_eoi(uint8_t irq) {
     if(irq >= 8) {
         outb(PIC2_COMMAND, PIC_EOI);
     }
     outb(PIC1_COMMAND, PIC_EOI);
 }
 
-static void PIC_remap(int offset1, int offset2) {
+static void pic_remap(int offset1, int offset2) {
     outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
     io_wait();
     outb(PIC2_COMMAND, ICW1_INIT | ICW1_ICW4);
@@ -57,7 +57,7 @@ static void PIC_remap(int offset1, int offset2) {
     io_wait();
 }
 
-void IRQ_mask(uint8_t irq_line) {
+void irq_mask(uint8_t irq_line) {
     uint16_t port;
     uint8_t value;
     
@@ -71,7 +71,7 @@ void IRQ_mask(uint8_t irq_line) {
     outb(port, value);
 }
 
-void IRQ_unmask(uint8_t irq_line) {
+void irq_unmask(uint8_t irq_line) {
     uint16_t port;
     uint8_t value;
     
@@ -85,10 +85,10 @@ void IRQ_unmask(uint8_t irq_line) {
     outb(port, value);
 }
 
-void PIC_init() {
+void pic_init() {
     outb(PIC1_DATA, 0xFF);
     outb(PIC2_DATA, 0xFF);
-    PIC_remap(MASTER_OFFSET, SLAVE_OFFSET);
+    pic_remap(MASTER_OFFSET, SLAVE_OFFSET);
     outb(PIC1_DATA, 0xFF);
     outb(PIC2_DATA, 0xFF);
 }

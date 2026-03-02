@@ -25,7 +25,7 @@ struct __attribute__((packed)) idt_ptr {
 
 static struct idt_ptr idtr;
 
-void IDT_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
+void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
     struct idt_entry *descriptor = &idt[vector];
 
     descriptor->isr_low = (uint64_t)isr & 0xFFFF;
@@ -42,16 +42,16 @@ static bool vectors[256];
 extern void* isr_stub_table[];
 extern void isr_stub_255(void);
 
-void IDT_init() {
+void idt_init() {
     idtr.base = (uintptr_t)&idt[0];
     idtr.limit = (uint16_t)sizeof(struct idt_entry) * 256 - 1;
 
     for(uint8_t i = 0; i < 48; i++) {
-        IDT_set_descriptor(i, isr_stub_table[i], 0x8E);
+        idt_set_descriptor(i, isr_stub_table[i], 0x8E);
         vectors[i] = true;
     }
 
-    IDT_set_descriptor(255, (void*)isr_stub_255, 0x8E);
+    idt_set_descriptor(255, (void*)isr_stub_255, 0x8E);
 
     __asm__ volatile ("lidt %0" : : "m"(idtr));
 }

@@ -61,29 +61,29 @@ void kmain(void) {
     serial_init();
     printk("Serial initialized.\n");
 
-    GDT_init();
-    printk("GDT_init() done.\n");
+    gdt_init();
+    printk("gdt_init() done.\n");
 
-    IDT_init();
-    printk("IDT_init() done.\n");
+    idt_init();
+    printk("idt_init() done.\n");
 
     __asm__ volatile ("sti");
 
-    PIC_init();
-    printk("PIC_init() done.\n");
+    pic_init();
+    printk("pic_init() done.\n");
 
     register_interrupt_handlers();
 
     __asm__ volatile ("sti");
     printk("Enabled interrupts\n");
 
-    LAPIC_init(0xFEE00000);
-    printk("LAPIC_init() done.\n");
+    lapic_init(0xFEE00000);
+    printk("lapic_init() done.\n");
 
-    LAPIC_timer_init(0x20, 10);
-    printk("LAPIC timer set up at 100Hz!\n");
+    lapic_timer_init(0x20, 10);
+    printk("lapic timer set up at 100Hz!\n");
 
-    IRQ_mask(0);
+    irq_mask(0);
 
     // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL
@@ -94,7 +94,7 @@ void kmain(void) {
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
-    printk("v%d.%d.%d\n", MAJOR, MINOR, PATCH);
+    printk("joshjmsOS v%d.%d.%d\n", MAJOR, MINOR, PATCH);
 
     // We're done, just hang...
     hcf();

@@ -2,10 +2,10 @@
 
 #include <stdint.h>
 
-void LAPIC_init(uintptr_t lapic_base);
+void lapic_init(uintptr_t lapic_base);
 
-void LAPIC_timer_init(uint8_t vector, uint32_t ms);
+void lapic_timer_init(uint8_t vector, uint32_t ms);
 
-void LAPIC_eoi(void);
+void lapic_eoi(void);
 
-uint32_t LAPIC_id(void);
+uint32_t lapic_id(void);
