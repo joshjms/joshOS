@@ -1,42 +1,17 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <limine.h>
 
+#include <limine.h>
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/idt.h>
 #include <arch/x86_64/pic.h>
 #include <arch/x86_64/apic.h>
+#include <arch/x86_64/ioapic.h>
 #include <interrupts/handlers.h>
 #include <drivers/serial.h>
+#include <limine/requests.h>
 #include <printk.h>
-
-// Set the base revision to 5, this is recommended as this is the latest
-// base revision described by the Limine boot protocol specification.
-// See specification for further info.
-
-__attribute__((used, section(".limine_requests")))
-static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(5);
-
-// The Limine requests can be placed anywhere, but it is important that
-// the compiler does not optimise them away, so, usually, they should
-// be made volatile or equivalent, _and_ they should be accessed at least
-// once or marked as used with the "used" attribute as done here.
-
-__attribute__((used, section(".limine_requests")))
-static volatile struct limine_framebuffer_request framebuffer_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST_ID,
-    .revision = 0
-};
-
-// Finally, define the start and end markers for the Limine requests.
-// These can also be moved anywhere, to any .c file, as seen fit.
-
-__attribute__((used, section(".limine_requests_start")))
-static volatile uint64_t limine_requests_start_marker[] = LIMINE_REQUESTS_START_MARKER;
-
-__attribute__((used, section(".limine_requests_end")))
-static volatile uint64_t limine_requests_end_marker[] = LIMINE_REQUESTS_END_MARKER;
 
 // Halt and catch fire function.
 static void hcf(void) {
@@ -72,18 +47,24 @@ void kmain(void) {
     pic_init();
     printk("pic_init() done.\n");
 
+    if(!hhdm_request.response) {
+        hcf();
+    }
+    uint64_t hhdm = hhdm_request.response->offset;
+
+    lapic_init(hhdm + 0xFEE00000);
+    printk("lapic_init() done.\n");
+
+    ioapic_init(hhdm + 0xFEC00000);
+    printk("ioapic_init() done.\n");
+
     register_interrupt_handlers();
 
     __asm__ volatile ("sti");
     printk("Enabled interrupts\n");
 
-    lapic_init(0xFEE00000);
-    printk("lapic_init() done.\n");
-
     lapic_timer_init(0x20, 10);
     printk("lapic timer set up at 100Hz!\n");
-
-    irq_mask(0);
 
     // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL
