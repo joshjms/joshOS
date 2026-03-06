@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
-#include <memory.h>
+#include <utils/memory.h>
 
 // GCC and Clang reserve the right to generate calls to the following
 // 4 functions even if they are not directly called.

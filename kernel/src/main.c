@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include <limine.h>
+
 #include <arch/x86_64/gdt.h>
 #include <arch/x86_64/idt.h>
 #include <arch/x86_64/pic.h>
@@ -10,9 +11,11 @@
 #include <arch/x86_64/ioapic.h>
 #include <interrupts/handlers.h>
 #include <drivers/serial.h>
+#include <drivers/ps2.h>
 #include <limine/requests.h>
-#include <mm/pmm.h>
-#include <printk.h>
+#include <memory/pmm.h>
+#include <memory/vmm.h>
+#include <utils/printk.h>
 
 // Halt and catch fire function.
 static void hcf(void) {
@@ -43,6 +46,9 @@ void kmain(void) {
     pmm_init();
     printk("pmm_init() done.\n");
 
+    vmm_init();
+    printk("vmm_init() done.\n");
+
     idt_init();
     printk("idt_init() done.\n");
 
@@ -56,13 +62,25 @@ void kmain(void) {
     }
     uint64_t hhdm = hhdm_request.response->offset;
 
+    pagemap_t *kernel_pagemap = vmm_get_kernel_pagemap();
+    if(!kernel_pagemap) {
+        hcf();
+    }
+
+    // Map the APIC first
+    vmm_map(kernel_pagemap, hhdm + 0xFEE00000, 0xFEE00000, PTE_WRITABLE | PTE_NX | PTE_PWT | PTE_PCD);
     lapic_init(hhdm + 0xFEE00000);
     printk("lapic_init() done.\n");
 
+    // Map the IOAPIC first
+    vmm_map(kernel_pagemap, hhdm + 0xFEC00000, 0xFEC00000, PTE_WRITABLE | PTE_NX | PTE_PWT | PTE_PCD);
     ioapic_init(hhdm + 0xFEC00000);
     printk("ioapic_init() done.\n");
 
     register_interrupt_handlers();
+
+    ps2_init();
+    printk("ps2_init() done.\n");
 
     __asm__ volatile ("sti");
     printk("Enabled interrupts\n");

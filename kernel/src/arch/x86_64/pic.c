@@ -25,7 +25,7 @@
 #define ICW4_BUF_MASTER	0x0C		/* Buffered mode/master */
 #define ICW4_SFNM	0x10		/* Special fully nested (not) */
 
-#define CASCADE_irq 2
+#define CASCADE_IRQ 2
 
 #define MASTER_OFFSET 0x20
 #define SLAVE_OFFSET 0x28
@@ -46,7 +46,7 @@ static void pic_remap(int offset1, int offset2) {
     io_wait();
     outb(PIC2_DATA, offset2);
     io_wait();
-    outb(PIC1_DATA, (1 << CASCADE_irq));
+    outb(PIC1_DATA, (1 << CASCADE_IRQ));
     io_wait();
     outb(PIC2_DATA, 2);
     io_wait();
@@ -57,7 +57,7 @@ static void pic_remap(int offset1, int offset2) {
     io_wait();
 }
 
-void irq_mask(uint8_t irq_line) {
+void pic_mask(uint8_t irq_line) {
     uint16_t port;
     uint8_t value;
     
@@ -71,7 +71,7 @@ void irq_mask(uint8_t irq_line) {
     outb(port, value);
 }
 
-void irq_unmask(uint8_t irq_line) {
+void pic_unmask(uint8_t irq_line) {
     uint16_t port;
     uint8_t value;
     

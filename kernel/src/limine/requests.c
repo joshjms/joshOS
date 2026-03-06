@@ -40,6 +40,12 @@ volatile struct limine_paging_mode_request paging_mode_request = {
     .revision = 0,
 };
 
+__attribute__((used, section(".limine_requests")))
+volatile struct limine_executable_address_request kernel_address_request = {
+    .id = LIMINE_EXECUTABLE_ADDRESS_REQUEST_ID,
+    .revision = 0,
+};
+
 // Finally, define the start and end markers for the Limine requests.
 // These can also be moved anywhere, to any .c file, as seen fit.
 
