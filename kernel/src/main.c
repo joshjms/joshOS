@@ -15,6 +15,7 @@
 #include <limine/requests.h>
 #include <memory/pmm.h>
 #include <memory/vmm.h>
+#include <memory/heap.h>
 #include <utils/printk.h>
 
 // Halt and catch fire function.
@@ -48,6 +49,9 @@ void kmain(void) {
 
     vmm_init();
     printk("vmm_init() done.\n");
+
+    heap_init();
+    printk("heap_init() done.\n");
 
     idt_init();
     printk("idt_init() done.\n");
