@@ -139,6 +139,7 @@ obj/%.c.o: %.c GNUmakefile
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Compilation rules for *.S files.
+obj/src/fonts/font.S.o: src/fonts/Lat15-Terminus14.psf
 obj/%.S.o: %.S GNUmakefile
 	mkdir -p "$(dir $@)"
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@

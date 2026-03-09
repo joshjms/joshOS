@@ -12,6 +12,7 @@
 #include <interrupts/handlers.h>
 #include <drivers/serial.h>
 #include <drivers/ps2.h>
+#include <drivers/fb.h>
 #include <limine/requests.h>
 #include <memory/pmm.h>
 #include <memory/vmm.h>
@@ -24,10 +25,6 @@ static void hcf(void) {
         __asm__ volatile ("hlt");
     }
 }
-
-const int MAJOR = 0;
-const int MINOR = 1;
-const int PATCH = 0;
 
 // The following will be our kernel's entry point.
 // If renaming kmain() to something else, make sure to change the
@@ -64,11 +61,9 @@ void kmain(void) {
         hcf();
     }
 
-    // Map the APIC first
     vmm_map(kernel_pagemap, hhdm + 0xFEE00000, 0xFEE00000, PTE_WRITABLE | PTE_NX | PTE_PWT | PTE_PCD);
     lapic_init(hhdm + 0xFEE00000);
 
-    // Map the IOAPIC first
     vmm_map(kernel_pagemap, hhdm + 0xFEC00000, 0xFEC00000, PTE_WRITABLE | PTE_NX | PTE_PWT | PTE_PCD);
     ioapic_init(hhdm + 0xFEC00000);
 
@@ -80,16 +75,19 @@ void kmain(void) {
 
     lapic_timer_init(0x20, 10);
 
-    // Ensure we got a framebuffer.
     if (framebuffer_request.response == NULL
      || framebuffer_request.response->framebuffer_count < 1) {
         hcf();
     }
 
-    // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 
-    printk("joshjmsOS v%d.%d.%d\n", MAJOR, MINOR, PATCH);
+    fb_init(framebuffer);
+
+    const char *msg = "joshjmsOS";
+    for (int i = 0; msg[i]; i++) {
+        fb_putchar(msg[i], 10 + i * 10, 10, 0xFFFFFF, 0x000000);
+    }
 
     // We're done, just hang...
     hcf();
